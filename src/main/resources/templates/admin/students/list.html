@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Students | Admin SMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="admin-navbar"><div class="navbar-left"><button class="hamburger-btn" onclick="toggleAdminSidebar()"><i class="bi bi-list"></i></button><div class="brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><span class="brand-text">University SMS</span><span class="badge-admin">ADMIN</span></div></div><div class="navbar-right"><div class="nav-icon"><i class="bi bi-bell-fill"></i></div><div class="user-pill" onclick="toggleAdminUserDropdown()"><div class="avatar" th:text="${fullName?.substring(0,1)}">A</div><span th:text="${fullName}">Admin</span><div class="user-dropdown" id="adminUserDropdown"><a href="#"><i class="bi bi-person"></i> Profile</a><hr><a href="#" onclick="logout()" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a></div></div></div></nav>
+    <aside class="admin-sidebar" id="adminSidebar"><div class="sidebar-section-title">Main</div><a href="/admin/dashboard" class="admin-nav-item"><i class="bi bi-grid-1x2-fill"></i> <span class="nav-text">Dashboard</span></a><div class="sidebar-section-title">Student Mgmt</div><a href="#" class="admin-nav-item open" onclick="toggleAdminSubMenu(this);return false"><i class="bi bi-people-fill"></i> <span class="nav-text">Students</span><i class="bi bi-chevron-right nav-arrow"></i></a><div class="admin-sub-menu show"><a href="/admin/students" class="active">All Students</a><a href="/admin/students/new">Add Student</a><a href="/admin/students/import">Bulk Import</a><a href="/admin/students/documents">Documents</a></div><div class="sidebar-section-title">Academics</div><a href="/admin/courses" class="admin-nav-item"><i class="bi bi-journal-code"></i> <span class="nav-text">Courses</span></a><a href="/admin/attendance" class="admin-nav-item"><i class="bi bi-clipboard-data-fill"></i> <span class="nav-text">Attendance</span></a><a href="/admin/results" class="admin-nav-item"><i class="bi bi-trophy-fill"></i> <span class="nav-text">Results</span></a><div class="sidebar-section-title">Finance</div><a href="/admin/fees/structure" class="admin-nav-item"><i class="bi bi-cash-stack"></i> <span class="nav-text">Fees</span></a><div class="sidebar-section-title">Communication</div><a href="/admin/announcements" class="admin-nav-item"><i class="bi bi-megaphone-fill"></i> <span class="nav-text">Announcements</span></a><a href="/admin/forum" class="admin-nav-item"><i class="bi bi-chat-square-dots-fill"></i> <span class="nav-text">Forum</span></a></aside>
+
+    <main class="admin-main">
+        <div class="content-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><h1><i class="bi bi-people-fill me-2"></i>All Students</h1><p>Manage student records</p></div>
+            <div class="d-flex gap-2">
+                <a href="/admin/students/import" class="btn-admin" style="text-decoration:none;background:rgba(79,70,229,0.1);color:#4f46e5"><i class="bi bi-upload me-1"></i>Import CSV</a>
+                <a href="/admin/students/new" class="btn-admin" style="text-decoration:none"><i class="bi bi-plus-lg me-1"></i>Add Student</a>
+            </div>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="admin-card" style="margin-bottom:16px">
+            <div class="admin-card-body" style="padding:16px 20px">
+                <form class="d-flex gap-3 flex-wrap" method="get" action="/admin/students">
+                    <div class="input-group" style="max-width:320px">
+                        <span class="input-group-text" style="border-radius:8px 0 0 8px;background:#f8fafc"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Search by name, code, or email..." style="border-radius:0 8px 8px 0" th:value="${search}">
+                    </div>
+                    <button type="submit" class="btn-admin" style="padding:8px 16px">Search</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Students Table -->
+        <div class="admin-card">
+            <div class="admin-card-body">
+                <table class="admin-table">
+                    <thead><tr><th>Code</th><th>Name</th><th>Program</th><th>Sem</th><th>Batch</th><th>Campus</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        <tr th:each="s : ${students?.content}">
+                            <td><strong th:text="${s.studentCode}"></strong></td>
+                            <td th:text="${s.fullName}"></td>
+                            <td th:text="${s.program?.name}"></td>
+                            <td th:text="${s.currentSemester}"></td>
+                            <td th:text="${s.batchYear}"></td>
+                            <td th:text="${s.campus}"></td>
+                            <td th:text="${s.phone}"></td>
+                            <td><span class="admin-badge badge-active" th:if="${s.user?.isActive}">Active</span><span class="admin-badge badge-inactive" th:unless="${s.user?.isActive}">Inactive</span></td>
+                            <td>
+                                <button class="btn-sm-action" title="View"><i class="bi bi-eye"></i></button>
+                                <button class="btn-sm-action" title="Edit"><i class="bi bi-pencil"></i></button>
+                                <button class="btn-sm-action btn-sm-danger" title="Deactivate"><i class="bi bi-person-x"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav th:if="${students?.totalPages > 1}" class="mt-3">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${students.first ? 'disabled' : ''}">
+                    <a class="page-link" th:href="'/admin/students?page=' + ${students.number - 1}">‹</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, students.totalPages - 1)}" class="page-item" th:classappend="${i == students.number ? 'active' : ''}">
+                    <a class="page-link" th:href="'/admin/students?page=' + ${i}" th:text="${i + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${students.last ? 'disabled' : ''}">
+                    <a class="page-link" th:href="'/admin/students?page=' + ${students.number + 1}">›</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students Forum | University SMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/student.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="top-navbar"><div class="navbar-left"><button class="hamburger-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button><div class="brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><span class="brand-text">University of Technology</span></div></div><div class="navbar-right"><div class="notification-bell"><i class="bi bi-bell-fill"></i></div><div class="user-menu" onclick="toggleUserDropdown()"><div class="user-avatar" th:text="${fullName?.substring(0,1)}">S</div><span class="user-name" th:text="${fullName}">Student</span><i class="bi bi-chevron-down"></i><div class="user-dropdown" id="userDropdown"><a href="/student/profile"><i class="bi bi-person"></i> My Profile</a><hr><a href="#" onclick="logout()" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a></div></div></div></nav>
+    <aside class="sidebar" id="sidebar"><div class="sidebar-profile"><div class="profile-avatar" th:text="${fullName?.substring(0,1)}">S</div><div class="profile-info"><span class="profile-name" th:text="${fullName}">Student</span><span class="online-status"><span class="green-dot"></span> Online</span></div></div><nav class="sidebar-nav"><a href="/student/dashboard" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span></a><div class="nav-group"><a href="#" class="nav-item nav-toggle" onclick="toggleSubMenu(this)"><i class="bi bi-person-gear"></i> <span>Self Service</span><i class="bi bi-chevron-right toggle-icon"></i></a><div class="sub-menu"><a href="/student/attendance"><i class="bi bi-calendar-check"></i> My Attendance</a><a href="/student/results"><i class="bi bi-trophy"></i> My Results</a><a href="/student/fees"><i class="bi bi-credit-card"></i> My Fee / Payment</a><a href="/student/admit-card"><i class="bi bi-card-heading"></i> Admit Card</a><a href="/student/exam-form"><i class="bi bi-file-earmark-text"></i> Examination Form</a><a href="/student/documents"><i class="bi bi-folder2-open"></i> My Documents</a></div></div><a href="/student/forum" class="nav-item active"><i class="bi bi-chat-square-dots-fill"></i> <span>Students Forum</span></a><a href="/student/feedback" class="nav-item"><i class="bi bi-star-fill"></i> <span>Feedback</span></a><a href="#" onclick="logout()" class="nav-item nav-logout"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a></nav></aside>
+
+    <main class="main-content">
+        <div class="content-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><h1><i class="bi bi-chat-square-dots-fill me-2"></i>Students Forum</h1><p class="text-muted">Discuss topics, share resources, and connect with peers</p></div>
+            <button class="btn-primary-custom" onclick="document.getElementById('newThreadModal').classList.add('show')"><i class="bi bi-plus-lg me-2"></i>New Thread</button>
+        </div>
+
+        <!-- Search -->
+        <div class="page-card" style="margin-bottom:20px">
+            <div class="page-card-body" style="padding:12px 20px">
+                <div class="input-group">
+                    <span class="input-group-text" style="border-radius:10px 0 0 10px;border-right:0;background:#f8f9fb"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search threads by keyword..." style="border-radius:0 10px 10px 0;border-left:0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Thread List -->
+        <div class="page-card">
+            <div class="page-card-body" style="padding:0">
+                <table class="data-table">
+                    <thead><tr><th></th><th>Title</th><th>Category</th><th>Replies</th><th>Author</th><th>Date</th></tr></thead>
+                    <tbody>
+                        <tr th:each="thread : ${threads}">
+                            <td style="width:24px">
+                                <i class="bi bi-pin-angle-fill text-primary" th:if="${thread.isPinned}" title="Pinned"></i>
+                            </td>
+                            <td>
+                                <a href="#" style="color:var(--primary);text-decoration:none;font-weight:600" th:text="${thread.title}">Tips for DS exam</a>
+                            </td>
+                            <td>
+                                <span class="category-badge cat-general" th:text="${thread.category ?: 'General'}">Academic</span>
+                            </td>
+                            <td style="color:var(--text-muted)">—</td>
+                            <td th:text="${thread.author?.username}">STU2024001</td>
+                            <td style="color:var(--text-muted);font-size:0.82rem" th:text="${#temporals.format(thread.createdAt, 'dd MMM yyyy')}">12 Mar 2026</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(threads)}">
+                            <td colspan="6" class="text-center text-muted" style="padding:40px">No threads yet. Be the first to start a discussion!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Thread Modal -->
+    <div class="modal-overlay" id="newThreadModal">
+        <div class="modal-content" style="max-width:600px">
+            <div class="modal-header"><h4>Create New Thread</h4><button onclick="document.getElementById('newThreadModal').classList.remove('show')" class="modal-close">&times;</button></div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label" style="font-weight:600">Title</label><input type="text" class="form-control" placeholder="Thread title..." style="border-radius:10px"></div>
+                <div class="mb-3"><label class="form-label" style="font-weight:600">Category</label><select class="form-select" style="border-radius:10px"><option>General</option><option>Academic</option><option>Events</option><option>Help</option></select></div>
+                <div class="mb-3"><label class="form-label" style="font-weight:600">Content</label><textarea class="form-control" rows="5" placeholder="Write your post..." style="border-radius:10px"></textarea></div>
+                <button class="btn-primary-custom" onclick="alert('Thread created!');document.getElementById('newThreadModal').classList.remove('show')"><i class="bi bi-send me-2"></i>Post Thread</button>
+            </div>
+        </div>
+    </div>
+    <script src="/js/student.js"></script>
+</body>
+</html>

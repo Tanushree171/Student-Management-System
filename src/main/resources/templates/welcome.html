@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | University SMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .welcome-card {
+            text-align: center;
+            max-width: 600px;
+            padding: 64px 48px;
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 28px;
+        }
+        .welcome-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 24px;
+            box-shadow: 0 12px 40px rgba(102,126,234,0.3);
+        }
+        h1 { font-weight: 800; font-size: 2rem; margin-bottom: 8px; }
+        .welcome-sub { color: rgba(255,255,255,0.5); font-size: 1rem; margin-bottom: 40px; }
+        .btn-proceed {
+            padding: 16px 48px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-proceed:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102,126,234,0.4);
+            color: #fff;
+        }
+        .info-badges { margin-top: 32px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .info-badges .badge-item {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .info-badges .badge-item i { color: #667eea; margin-right: 6px; }
+    </style>
+</head>
+<body>
+    <div class="welcome-card">
+        <div class="welcome-avatar" th:text="${fullName != null ? fullName.substring(0,1) : 'S'}">S</div>
+        <h1>Welcome, <span th:text="${fullName ?: 'Student'}">Student</span>!</h1>
+        <p class="welcome-sub">You are logged in to the University Student Management System</p>
+
+        <a href="/student/dashboard" class="btn-proceed">
+            Proceed to Dashboard <i class="bi bi-arrow-right"></i>
+        </a>
+
+        <div class="info-badges">
+            <div class="badge-item">
+                <i class="bi bi-shield-check"></i> Secure Connection
+            </div>
+            <div class="badge-item">
+                <i class="bi bi-clock"></i> Session: 8 hours
+            </div>
+            <div class="badge-item">
+                <i class="bi bi-person-check"></i> <span th:text="${role ?: 'ROLE_STUDENT'}">ROLE_STUDENT</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

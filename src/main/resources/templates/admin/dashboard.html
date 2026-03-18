@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | University SMS</title>
+    <meta name="description" content="Admin Dashboard - University Student Management System">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <!-- ADMIN NAVBAR -->
+    <nav class="admin-navbar">
+        <div class="navbar-left">
+            <button class="hamburger-btn" onclick="toggleAdminSidebar()"><i class="bi bi-list"></i></button>
+            <div class="brand">
+                <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+                <span class="brand-text">University SMS</span>
+                <span class="badge-admin">ADMIN</span>
+            </div>
+        </div>
+        <div class="navbar-right">
+            <div class="nav-icon"><i class="bi bi-bell-fill"></i><span class="notif-badge" th:text="${unreadNotifications}" th:if="${unreadNotifications > 0}">3</span></div>
+            <div class="user-pill" onclick="toggleAdminUserDropdown()">
+                <div class="avatar" th:text="${fullName?.substring(0,1)}">A</div>
+                <span th:text="${fullName}">Admin</span>
+                <div class="user-dropdown" id="adminUserDropdown">
+                    <a href="#"><i class="bi bi-person"></i> Profile</a>
+                    <a href="/admin/settings"><i class="bi bi-gear"></i> Settings</a>
+                    <hr>
+                    <a href="#" onclick="logout()" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ADMIN SIDEBAR -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-section-title">Main</div>
+        <a href="/admin/dashboard" class="admin-nav-item active">
+            <i class="bi bi-grid-1x2-fill"></i> <span class="nav-text">Dashboard</span>
+        </a>
+
+        <div class="sidebar-section-title">Student Management</div>
+        <a href="#" class="admin-nav-item" onclick="toggleAdminSubMenu(this);return false">
+            <i class="bi bi-people-fill"></i> <span class="nav-text">Students</span>
+            <i class="bi bi-chevron-right nav-arrow"></i>
+        </a>
+        <div class="admin-sub-menu">
+            <a href="/admin/students">All Students</a>
+            <a href="/admin/students/new">Add Student</a>
+            <a href="/admin/students/import">Bulk Import</a>
+            <a href="/admin/students/documents">Documents</a>
+        </div>
+
+        <div class="sidebar-section-title">Academics</div>
+        <a href="/admin/courses" class="admin-nav-item"><i class="bi bi-journal-code"></i> <span class="nav-text">Courses</span></a>
+        <a href="#" class="admin-nav-item" onclick="toggleAdminSubMenu(this);return false">
+            <i class="bi bi-clipboard-data-fill"></i> <span class="nav-text">Attendance</span>
+            <i class="bi bi-chevron-right nav-arrow"></i>
+        </a>
+        <div class="admin-sub-menu"><a href="/admin/attendance">Upload / Manage</a></div>
+        <a href="#" class="admin-nav-item" onclick="toggleAdminSubMenu(this);return false">
+            <i class="bi bi-trophy-fill"></i> <span class="nav-text">Results</span>
+            <i class="bi bi-chevron-right nav-arrow"></i>
+        </a>
+        <div class="admin-sub-menu"><a href="/admin/results">Manage Results</a><a href="/admin/backlogs">Backlogs</a></div>
+
+        <div class="sidebar-section-title">Examinations</div>
+        <a href="/admin/admit-cards" class="admin-nav-item"><i class="bi bi-card-heading"></i> <span class="nav-text">Admit Cards</span></a>
+        <a href="/admin/exam-forms" class="admin-nav-item"><i class="bi bi-file-earmark-check-fill"></i> <span class="nav-text">Exam Forms</span></a>
+        <a href="/admin/exam-schedule" class="admin-nav-item"><i class="bi bi-calendar-event-fill"></i> <span class="nav-text">Schedule</span></a>
+
+        <div class="sidebar-section-title">Finance</div>
+        <a href="#" class="admin-nav-item" onclick="toggleAdminSubMenu(this);return false">
+            <i class="bi bi-cash-stack"></i> <span class="nav-text">Fees</span>
+            <i class="bi bi-chevron-right nav-arrow"></i>
+        </a>
+        <div class="admin-sub-menu"><a href="/admin/fees/structure">Fee Structure</a><a href="/admin/fees/records">Records</a><a href="/admin/fees/reports">Reports</a></div>
+
+        <div class="sidebar-section-title">Communication</div>
+        <a href="/admin/announcements" class="admin-nav-item"><i class="bi bi-megaphone-fill"></i> <span class="nav-text">Announcements</span></a>
+        <a href="/admin/forum" class="admin-nav-item"><i class="bi bi-chat-square-dots-fill"></i> <span class="nav-text">Forum</span></a>
+
+        <div class="sidebar-section-title">Administration</div>
+        <a href="/admin/users" class="admin-nav-item"><i class="bi bi-person-fill-gear"></i> <span class="nav-text">Users & Roles</span></a>
+        <a href="/admin/settings" class="admin-nav-item"><i class="bi bi-gear-fill"></i> <span class="nav-text">System Settings</span></a>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main" id="adminMain">
+        <div class="content-header">
+            <h1>Admin Dashboard</h1>
+            <p>Welcome back, <span th:text="${fullName}">Admin</span>! Here's a quick overview of the system.</p>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="admin-stats">
+            <div class="admin-stat-card">
+                <div class="stat-icon icon-students"><i class="bi bi-people-fill"></i></div>
+                <div class="stat-info"><div class="stat-value" th:text="${stats?.totalStudents ?: 0}">256</div><div class="stat-label">Total Students</div></div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="stat-icon icon-courses"><i class="bi bi-journal-code"></i></div>
+                <div class="stat-info"><div class="stat-value" th:text="${stats?.totalCourses ?: 0}">42</div><div class="stat-label">Total Courses</div></div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="stat-icon icon-fees"><i class="bi bi-cash-stack"></i></div>
+                <div class="stat-info"><div class="stat-value">Rs. <span th:text="${stats?.pendingDues ?: 0}">0</span></div><div class="stat-label">Pending Dues</div></div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="stat-icon icon-docs"><i class="bi bi-file-earmark-check-fill"></i></div>
+                <div class="stat-info"><div class="stat-value" th:text="${stats?.pendingDocuments ?: 0}">5</div><div class="stat-label">Pending Documents</div></div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="stat-icon icon-announce"><i class="bi bi-megaphone-fill"></i></div>
+                <div class="stat-info"><div class="stat-value" th:text="${stats?.activeAnnouncements ?: 0}">3</div><div class="stat-label">Active Announcements</div></div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="stat-icon icon-programs"><i class="bi bi-mortarboard-fill"></i></div>
+                <div class="stat-info"><div class="stat-value" th:text="${stats?.totalPrograms ?: 0}">4</div><div class="stat-label">Programs</div></div>
+            </div>
+        </div>
+
+        <!-- Recent Students Table -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h3><i class="bi bi-people-fill me-2"></i>Recent Students</h3>
+                <a href="/admin/students" class="btn-admin" style="text-decoration:none;font-size:0.8rem;padding:6px 14px">View All →</a>
+            </div>
+            <div class="admin-card-body">
+                <table class="admin-table">
+                    <thead><tr><th>Student Code</th><th>Name</th><th>Program</th><th>Semester</th><th>Batch</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        <tr th:each="s : ${recentStudents}">
+                            <td><strong th:text="${s.studentCode}">STU2024001</strong></td>
+                            <td th:text="${s.fullName}">Rahul Kumar</td>
+                            <td th:text="${s.program?.name}">B.Tech CSE</td>
+                            <td th:text="${s.currentSemester}">3</td>
+                            <td th:text="${s.batchYear}">2024</td>
+                            <td><span class="admin-badge badge-active" th:if="${s.user?.isActive}">Active</span><span class="admin-badge badge-inactive" th:unless="${s.user?.isActive}">Inactive</span></td>
+                            <td>
+                                <button class="btn-sm-action" title="View"><i class="bi bi-eye"></i></button>
+                                <button class="btn-sm-action" title="Edit"><i class="bi bi-pencil"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

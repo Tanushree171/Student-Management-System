@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements | Admin SMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="admin-navbar"><div class="navbar-left"><button class="hamburger-btn" onclick="toggleAdminSidebar()"><i class="bi bi-list"></i></button><div class="brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><span class="brand-text">University SMS</span><span class="badge-admin">ADMIN</span></div></div><div class="navbar-right"><div class="user-pill" onclick="toggleAdminUserDropdown()"><div class="avatar" th:text="${fullName?.substring(0,1)}">A</div><span th:text="${fullName}">Admin</span><div class="user-dropdown" id="adminUserDropdown"><a href="#" onclick="logout()" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a></div></div></div></nav>
+    <aside class="admin-sidebar" id="adminSidebar"><div class="sidebar-section-title">Main</div><a href="/admin/dashboard" class="admin-nav-item"><i class="bi bi-grid-1x2-fill"></i> <span class="nav-text">Dashboard</span></a><div class="sidebar-section-title">Communication</div><a href="/admin/announcements" class="admin-nav-item active"><i class="bi bi-megaphone-fill"></i> <span class="nav-text">Announcements</span></a><a href="/admin/forum" class="admin-nav-item"><i class="bi bi-chat-square-dots-fill"></i> <span class="nav-text">Forum</span></a></aside>
+
+    <main class="admin-main">
+        <div class="content-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><h1><i class="bi bi-megaphone-fill me-2"></i>Announcements</h1><p>Manage and publish announcements</p></div>
+            <a href="/admin/announcements/new" class="btn-admin" style="text-decoration:none"><i class="bi bi-plus-lg me-1"></i>New Announcement</a>
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-card-body">
+                <table class="admin-table">
+                    <thead><tr><th>Title</th><th>Category</th><th>Target</th><th>Posted By</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        <tr th:each="ann : ${announcements}">
+                            <td><strong th:text="${ann.title}">Exam Schedule</strong></td>
+                            <td><span class="admin-badge badge-info" th:text="${ann.category}">General</span></td>
+                            <td th:text="${ann.targetRole ?: 'All'}">All</td>
+                            <td th:text="${ann.postedBy?.username}">admin</td>
+                            <td style="font-size:0.82rem;color:var(--text-muted)" th:text="${#temporals.format(ann.createdAt, 'dd MMM yyyy')}">12 Mar 2026</td>
+                            <td><span class="admin-badge badge-active" th:if="${ann.isActive}">Active</span><span class="admin-badge badge-inactive" th:unless="${ann.isActive}">Archived</span></td>
+                            <td>
+                                <button class="btn-sm-action" title="Edit"><i class="bi bi-pencil"></i></button>
+                                <button class="btn-sm-action btn-sm-danger" title="Archive"><i class="bi bi-archive"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

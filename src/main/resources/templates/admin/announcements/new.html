@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>New Announcement | Admin SMS</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"><link href="/css/admin.css" rel="stylesheet"></head>
+<body>
+<nav class="admin-navbar"><div class="navbar-left"><button class="hamburger-btn" onclick="toggleAdminSidebar()"><i class="bi bi-list"></i></button><div class="brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><span class="brand-text">University SMS</span><span class="badge-admin">ADMIN</span></div></div><div class="navbar-right"><div class="user-pill" onclick="toggleAdminUserDropdown()"><div class="avatar" th:text="${fullName?.substring(0,1)}">A</div><span th:text="${fullName}">Admin</span><div class="user-dropdown" id="adminUserDropdown"><a href="#" onclick="logout()" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a></div></div></div></nav>
+<aside class="admin-sidebar" id="adminSidebar"><div class="sidebar-section-title">Main</div><a href="/admin/dashboard" class="admin-nav-item"><i class="bi bi-grid-1x2-fill"></i> <span class="nav-text">Dashboard</span></a><div class="sidebar-section-title">Communication</div><a href="/admin/announcements" class="admin-nav-item active"><i class="bi bi-megaphone-fill"></i> <span class="nav-text">Announcements</span></a></aside>
+<main class="admin-main">
+<div class="content-header"><h1><i class="bi bi-megaphone-fill me-2"></i>New Announcement</h1><p>Create and publish a new announcement</p></div>
+<div class="admin-card"><div class="admin-card-header"><h3>Announcement Details</h3></div><div class="admin-card-body" style="padding:24px">
+<form id="announcementForm"><div class="row g-3">
+<div class="col-12"><label class="form-label" style="font-weight:600;font-size:0.9rem">Title *</label><input type="text" class="form-control" required style="border-radius:8px" placeholder="Announcement title"></div>
+<div class="col-md-4"><label class="form-label" style="font-weight:600;font-size:0.9rem">Category</label><select class="form-select" style="border-radius:8px"><option>General Announcement</option><option>Examination Notice</option><option>Department Notice</option><option>Holiday Notice</option><option>Event</option></select></div>
+<div class="col-md-4"><label class="form-label" style="font-weight:600;font-size:0.9rem">Target Role</label><select class="form-select" style="border-radius:8px"><option value="">All</option><option>ROLE_STUDENT</option><option>ROLE_FACULTY</option></select></div>
+<div class="col-md-4"><label class="form-label" style="font-weight:600;font-size:0.9rem">Schedule</label><input type="datetime-local" class="form-control" style="border-radius:8px"></div>
+<div class="col-12"><label class="form-label" style="font-weight:600;font-size:0.9rem">Body *</label><textarea class="form-control" rows="6" required style="border-radius:8px" placeholder="Write your announcement content..."></textarea></div>
+<div class="col-md-6"><label class="form-label" style="font-weight:600;font-size:0.9rem">Attachment (optional)</label><input type="file" class="form-control" style="border-radius:8px"></div>
+</div><div class="mt-4 d-flex gap-2"><button type="button" class="btn-admin" onclick="alert('Announcement published!')"><i class="bi bi-send me-2"></i>Publish</button><a href="/admin/announcements" class="btn-admin" style="text-decoration:none;background:rgba(79,70,229,0.1);color:#4f46e5">Cancel</a></div></form>
+</div></div>
+</main><script src="/js/admin.js"></script></body></html>

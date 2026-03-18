@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Results | University SMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/student.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="top-navbar">
+        <div class="navbar-left">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+            <div class="brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><span class="brand-text">University of Technology</span></div>
+        </div>
+        <div class="navbar-right">
+            <div class="notification-bell"><i class="bi bi-bell-fill"></i><span class="notif-badge" th:text="${unreadNotifications}" th:if="${unreadNotifications > 0}">0</span></div>
+            <div class="user-menu" onclick="toggleUserDropdown()">
+                <div class="user-avatar" th:text="${fullName?.substring(0,1)}">S</div>
+                <span class="user-name" th:text="${fullName}">Student</span><i class="bi bi-chevron-down"></i>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/student/profile"><i class="bi bi-person"></i> My Profile</a><a href="#"><i class="bi bi-key"></i> Change Password</a><hr>
+                    <a href="#" onclick="logout()" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-profile"><div class="profile-avatar" th:text="${fullName?.substring(0,1)}">S</div><div class="profile-info"><span class="profile-name" th:text="${fullName}">Student</span><span class="online-status"><span class="green-dot"></span> Online</span></div></div>
+        <nav class="sidebar-nav">
+            <a href="/student/dashboard" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span></a>
+            <div class="nav-group"><a href="#" class="nav-item nav-toggle open" onclick="toggleSubMenu(this)"><i class="bi bi-person-gear"></i> <span>Self Service</span><i class="bi bi-chevron-right toggle-icon"></i></a>
+                <div class="sub-menu show">
+                    <a href="/student/attendance"><i class="bi bi-calendar-check"></i> My Attendance</a>
+                    <a href="/student/results" class="active"><i class="bi bi-trophy"></i> My Results</a>
+                    <a href="/student/fees"><i class="bi bi-credit-card"></i> My Fee / Payment</a>
+                    <a href="/student/admit-card"><i class="bi bi-card-heading"></i> Admit Card</a>
+                    <a href="/student/exam-form"><i class="bi bi-file-earmark-text"></i> Examination Form</a>
+                    <a href="/student/documents"><i class="bi bi-folder2-open"></i> My Documents</a>
+                </div>
+            </div>
+            <a href="/student/forum" class="nav-item"><i class="bi bi-chat-square-dots-fill"></i> <span>Students Forum</span></a>
+            <a href="/student/feedback" class="nav-item"><i class="bi bi-star-fill"></i> <span>Feedback</span></a>
+            <a href="#" onclick="logout()" class="nav-item nav-logout"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-header">
+            <h1><i class="bi bi-trophy me-2"></i>My Results</h1>
+            <p class="text-muted">View your academic results by semester</p>
+        </div>
+
+        <!-- Semester Tabs -->
+        <div class="semester-tabs">
+            <button th:each="i : ${#numbers.sequence(1, totalSemesters ?: 3)}"
+                    class="semester-tab"
+                    th:classappend="${i == (results?.semester ?: totalSemesters)} ? 'active' : ''"
+                    th:text="'Sem ' + ${i}"
+                    th:onclick="'window.location.href=\'/student/results?sem=\' + ' + ${i}">
+                Sem 1
+            </button>
+        </div>
+
+        <!-- Results Table -->
+        <div class="page-card">
+            <div class="page-card-header">
+                <h2>Semester <span th:text="${results?.semester ?: '3'}">3</span> Results</h2>
+                <button class="btn-primary-custom" onclick="alert('PDF download coming soon')">
+                    <i class="bi bi-download me-2"></i>Download Marksheet
+                </button>
+            </div>
+            <div class="page-card-body" style="padding:0">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Subject Code</th>
+                            <th>Subject Name</th>
+                            <th>Internal</th>
+                            <th>External</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                            <th>Grade Point</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="course : ${results?.courses}" th:style="${course.isBacklog ? 'background:#fef2f2' : ''}">
+                            <td><strong th:text="${course.courseCode}">CS301</strong></td>
+                            <td th:text="${course.courseName}">Data Structures</td>
+                            <td th:text="${course.internalMarks}">38</td>
+                            <td th:text="${course.externalMarks}">55</td>
+                            <td><strong th:text="${course.total}">93</strong></td>
+                            <td>
+                                <span class="pct-badge pct-green" th:text="${course.grade}">A+</span>
+                            </td>
+                            <td th:text="${course.gradePoint}">9.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SGPA / CGPA -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="page-card">
+                    <div class="page-card-body text-center" style="padding:28px">
+                        <p class="text-muted" style="font-size:0.85rem;margin-bottom:4px">SGPA (Semester <span th:text="${results?.semester}">3</span>)</p>
+                        <h2 style="font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent" th:text="${results?.sgpa ?: '0.00'}">8.78</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="page-card">
+                    <div class="page-card-body text-center" style="padding:28px">
+                        <p class="text-muted" style="font-size:0.85rem;margin-bottom:4px">CGPA (Overall)</p>
+                        <h2 style="font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,#22c55e,#16a34a);-webkit-background-clip:text;-webkit-text-fill-color:transparent" th:text="${results?.cgpa ?: '0.00'}">8.67</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/student.js"></script>
+</body>
+</html>

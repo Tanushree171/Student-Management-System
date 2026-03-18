@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Documents | University SMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/student.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="top-navbar"><div class="navbar-left"><button class="hamburger-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button><div class="brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><span class="brand-text">University of Technology</span></div></div><div class="navbar-right"><div class="notification-bell"><i class="bi bi-bell-fill"></i></div><div class="user-menu" onclick="toggleUserDropdown()"><div class="user-avatar" th:text="${fullName?.substring(0,1)}">S</div><span class="user-name" th:text="${fullName}">Student</span><i class="bi bi-chevron-down"></i><div class="user-dropdown" id="userDropdown"><a href="/student/profile"><i class="bi bi-person"></i> My Profile</a><hr><a href="#" onclick="logout()" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a></div></div></div></nav>
+    <aside class="sidebar" id="sidebar"><div class="sidebar-profile"><div class="profile-avatar" th:text="${fullName?.substring(0,1)}">S</div><div class="profile-info"><span class="profile-name" th:text="${fullName}">Student</span><span class="online-status"><span class="green-dot"></span> Online</span></div></div><nav class="sidebar-nav"><a href="/student/dashboard" class="nav-item"><i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span></a><div class="nav-group"><a href="#" class="nav-item nav-toggle open" onclick="toggleSubMenu(this)"><i class="bi bi-person-gear"></i> <span>Self Service</span><i class="bi bi-chevron-right toggle-icon"></i></a><div class="sub-menu show"><a href="/student/attendance"><i class="bi bi-calendar-check"></i> My Attendance</a><a href="/student/results"><i class="bi bi-trophy"></i> My Results</a><a href="/student/fees"><i class="bi bi-credit-card"></i> My Fee / Payment</a><a href="/student/admit-card"><i class="bi bi-card-heading"></i> Admit Card</a><a href="/student/exam-form"><i class="bi bi-file-earmark-text"></i> Examination Form</a><a href="/student/documents" class="active"><i class="bi bi-folder2-open"></i> My Documents</a></div></div><a href="/student/forum" class="nav-item"><i class="bi bi-chat-square-dots-fill"></i> <span>Students Forum</span></a><a href="/student/feedback" class="nav-item"><i class="bi bi-star-fill"></i> <span>Feedback</span></a><a href="#" onclick="logout()" class="nav-item nav-logout"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></a></nav></aside>
+
+    <main class="main-content">
+        <div class="content-header"><h1><i class="bi bi-folder2-open me-2"></i>My Documents</h1><p class="text-muted">Upload and manage your documents</p></div>
+
+        <!-- Upload Form -->
+        <div class="page-card">
+            <div class="page-card-header"><h2>Upload Document</h2></div>
+            <div class="page-card-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" style="font-weight:600;font-size:0.9rem">Document Type</label>
+                            <select class="form-select" style="border-radius:10px" name="docType">
+                                <option value="">Select type...</option>
+                                <option value="ID Proof">ID Proof</option>
+                                <option value="Address Proof">Address Proof</option>
+                                <option value="Marksheet">Marksheet (Previous)</option>
+                                <option value="Migration Certificate">Migration Certificate</option>
+                                <option value="Transfer Certificate">Transfer Certificate</option>
+                                <option value="Photo">Passport Photo</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label" style="font-weight:600;font-size:0.9rem">Choose File</label>
+                            <input type="file" class="form-control" style="border-radius:10px" name="file" accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn-primary-custom w-100" onclick="alert('Upload submitted!')">
+                                <i class="bi bi-upload me-2"></i>Upload
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Documents Table -->
+        <div class="page-card">
+            <div class="page-card-header"><h2>Uploaded Documents</h2></div>
+            <div class="page-card-body" style="padding:0">
+                <table class="data-table">
+                    <thead><tr><th>Type</th><th>File</th><th>Upload Date</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody>
+                        <tr th:each="doc : ${documents}">
+                            <td th:text="${doc.docType}">ID Proof</td>
+                            <td><i class="bi bi-file-earmark-pdf text-danger me-1"></i> <span th:text="${doc.filePath}">document.pdf</span></td>
+                            <td th:text="${doc.uploadedAt}">2026-01-15</td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${doc.status.name() == 'Approved' ? 'status-approved' : (doc.status.name() == 'Rejected' ? 'status-rejected' : 'status-pending')}"
+                                      th:text="${doc.status}">Pending</span>
+                            </td>
+                            <td><button class="btn btn-sm btn-outline-secondary" style="border-radius:8px"><i class="bi bi-download"></i></button></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(documents)}">
+                            <td colspan="5" class="text-center text-muted" style="padding:40px">No documents uploaded yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <script src="/js/student.js"></script>
+</body>
+</html>

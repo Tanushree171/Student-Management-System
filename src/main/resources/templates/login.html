@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | University Student Management System</title>
+    <meta name="description" content="Login to the University Student Management System">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        .login-card .logo-area {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .login-card .logo-area .logo-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .login-card .logo-area .logo-icon i {
+            font-size: 28px;
+            color: white;
+        }
+        .login-card h2 {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        .login-card p.subtitle {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+        }
+        .form-floating > .form-control {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+            border-radius: 12px;
+            height: 56px;
+        }
+        .form-floating > .form-control:focus {
+            background: rgba(255,255,255,0.12);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+            color: #fff;
+        }
+        .form-floating > label {
+            color: rgba(255,255,255,0.5);
+        }
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            color: #667eea;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+        }
+        .btn-login:active { transform: translateY(0); }
+        .forgot-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .forgot-link:hover { color: #8b9cf7; }
+        .alert-danger {
+            background: rgba(220,53,69,0.15);
+            border: 1px solid rgba(220,53,69,0.3);
+            color: #ff6b7a;
+            border-radius: 12px;
+        }
+        .floating-shapes div {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: floatShape 15s infinite;
+        }
+        .floating-shapes .shape1 { width: 300px; height: 300px; background: #667eea; top: -100px; left: -100px; animation-delay: 0s; }
+        .floating-shapes .shape2 { width: 200px; height: 200px; background: #764ba2; bottom: -50px; right: -50px; animation-delay: -5s; }
+        .floating-shapes .shape3 { width: 150px; height: 150px; background: #f093fb; top: 50%; right: 10%; animation-delay: -10s; }
+        @keyframes floatShape {
+            0%, 100% { transform: translate(0,0) rotate(0deg); }
+            25% { transform: translate(30px,-30px) rotate(90deg); }
+            50% { transform: translate(-20px,20px) rotate(180deg); }
+            75% { transform: translate(10px,-10px) rotate(270deg); }
+        }
+        .input-group-text {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.5);
+            border-radius: 12px 0 0 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape1"></div>
+        <div class="shape2"></div>
+        <div class="shape3"></div>
+    </div>
+
+    <div class="login-card">
+        <div class="logo-area">
+            <div class="logo-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <h2>University of Technology</h2>
+            <p class="subtitle">Student Management System</p>
+        </div>
+
+        <div id="alertBox" class="alert alert-danger d-none" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span id="alertMessage"></span>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="username" placeholder="Username or Email" required>
+                <label for="username"><i class="bi bi-person me-2"></i>Username or Email</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password" placeholder="Password" required>
+                <label for="password"><i class="bi bi-lock me-2"></i>Password</label>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberMe" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);">
+                    <label class="form-check-label" for="rememberMe" style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Remember me</label>
+                </div>
+                <a href="#" class="forgot-link">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                <span id="loginText">Sign In</span>
+                <span id="loginSpinner" class="d-none">
+                    <span class="spinner-border spinner-border-sm me-2"></span>Signing In...
+                </span>
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <small style="color:rgba(255,255,255,0.3);">© 2026 University of Technology. All rights reserved.</small>
+        </div>
+    </div>
+
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const loginText = document.getElementById('loginText');
+            const loginSpinner = document.getElementById('loginSpinner');
+            const alertBox = document.getElementById('alertBox');
+
+            loginText.classList.add('d-none');
+            loginSpinner.classList.remove('d-none');
+            btn.disabled = true;
+            alertBox.classList.add('d-none');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = data.data.redirectUrl;
+                } else {
+                    document.getElementById('alertMessage').textContent = data.message;
+                    alertBox.classList.remove('d-none');
+                }
+            } catch (err) {
+                document.getElementById('alertMessage').textContent = 'Connection error. Please try again.';
+                alertBox.classList.remove('d-none');
+            } finally {
+                loginText.classList.remove('d-none');
+                loginSpinner.classList.add('d-none');
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

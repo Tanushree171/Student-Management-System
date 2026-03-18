@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | University SMS</title>
+    <meta name="description" content="Student Dashboard - University Student Management System">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/student.css" rel="stylesheet">
+</head>
+<body>
+    <!-- TOP NAVBAR -->
+    <nav class="top-navbar" id="topNavbar">
+        <div class="navbar-left">
+            <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="brand">
+                <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+                <span class="brand-text">University of Technology</span>
+            </div>
+        </div>
+        <div class="navbar-right">
+            <div class="notification-bell" id="notifBell">
+                <i class="bi bi-bell-fill"></i>
+                <span class="notif-badge" th:text="${unreadNotifications}" th:if="${unreadNotifications > 0}">3</span>
+            </div>
+            <div class="user-menu" id="userMenu" onclick="toggleUserDropdown()">
+                <div class="user-avatar" th:text="${fullName != null ? fullName.substring(0,1) : 'S'}">R</div>
+                <span class="user-name" th:text="${fullName ?: 'Student'}">Rahul Kumar</span>
+                <i class="bi bi-chevron-down"></i>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/student/profile"><i class="bi bi-person"></i> My Profile</a>
+                    <a href="#"><i class="bi bi-key"></i> Change Password</a>
+                    <hr>
+                    <a href="#" onclick="logout()" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-profile">
+            <div class="profile-avatar" th:text="${fullName != null ? fullName.substring(0,1) : 'S'}">R</div>
+            <div class="profile-info">
+                <span class="profile-name" th:text="${fullName ?: 'Student'}">Rahul Kumar</span>
+                <span class="online-status"><span class="green-dot"></span> Online</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/student/dashboard" class="nav-item active">
+                <i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span>
+            </a>
+            <div class="nav-group">
+                <a href="#" class="nav-item nav-toggle" onclick="toggleSubMenu(this)">
+                    <i class="bi bi-person-gear"></i> <span>Self Service</span>
+                    <i class="bi bi-chevron-right toggle-icon"></i>
+                </a>
+                <div class="sub-menu">
+                    <a href="/student/attendance"><i class="bi bi-calendar-check"></i> My Attendance</a>
+                    <a href="/student/results"><i class="bi bi-trophy"></i> My Results</a>
+                    <a href="/student/fees"><i class="bi bi-credit-card"></i> My Fee / Payment</a>
+                    <a href="/student/admit-card"><i class="bi bi-card-heading"></i> Admit Card</a>
+                    <a href="/student/exam-form"><i class="bi bi-file-earmark-text"></i> Examination Form</a>
+                    <a href="/student/documents"><i class="bi bi-folder2-open"></i> My Documents</a>
+                </div>
+            </div>
+            <a href="/student/forum" class="nav-item">
+                <i class="bi bi-chat-square-dots-fill"></i> <span>Students Forum</span>
+            </a>
+            <a href="/student/feedback" class="nav-item">
+                <i class="bi bi-star-fill"></i> <span>Feedback</span>
+            </a>
+            <a href="https://library.university.edu" target="_blank" class="nav-item">
+                <i class="bi bi-book-fill"></i> <span>University Library</span>
+                <i class="bi bi-box-arrow-up-right" style="font-size:0.7rem;margin-left:auto;opacity:0.5"></i>
+            </a>
+            <a href="#" onclick="logout()" class="nav-item nav-logout">
+                <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+        <div class="content-header">
+            <h1>Dashboard</h1>
+            <p class="text-muted">Welcome back, <span th:text="${fullName ?: 'Student'}">Rahul</span>! Here's your academic overview.</p>
+        </div>
+
+        <!-- 4 STAT CARDS -->
+        <div class="stat-cards">
+            <!-- Card 1: Attendance -->
+            <div class="stat-card card-attendance">
+                <div class="card-bg-icon"><i class="bi bi-bar-chart-fill"></i></div>
+                <div class="card-content">
+                    <div class="card-number" th:text="${stats?.attendancePercentage != null ? #numbers.formatDecimal(stats.attendancePercentage, 0, 0) + '%' : '0%'}">74%</div>
+                    <div class="card-label">Attendance (current semester)</div>
+                    <div class="card-links">
+                        <a href="/student/attendance">More info →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Upcoming Fee -->
+            <div class="stat-card card-fee">
+                <div class="card-bg-icon"><i class="bi bi-wallet2"></i></div>
+                <div class="card-content">
+                    <div class="card-tag">UPCOMING FEE</div>
+                    <div class="card-number" style="font-size:1.3rem">
+                        Payment (Rs. <span th:text="${stats?.upcomingFeeAmount ?: '0'}">59200</span>)
+                        <span class="fee-date" th:text="'[' + (${stats?.feeDueDate ?: 'N/A'}) + ']'">[30-Jun-2026]</span>
+                    </div>
+                    <div class="card-links">
+                        <a href="/student/fees" class="btn-pay">Make Payment →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Activities -->
+            <div class="stat-card card-activities">
+                <div class="card-bg-icon"><i class="bi bi-person-plus-fill"></i></div>
+                <div class="card-content">
+                    <div class="card-number" th:text="${stats?.activityCount ?: 0}">10</div>
+                    <div class="card-label">Number of Activities</div>
+                    <div class="card-links">
+                        <a href="/student/attendance">More info →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: SGPA -->
+            <div class="stat-card card-sgpa">
+                <div class="card-bg-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="card-content">
+                    <div class="card-number" th:text="${stats?.sgpa ?: '0.00'}">8.78</div>
+                    <div class="card-label">SGPA — <span th:text="${stats?.sgpaSemesterLabel ?: 'Current Semester'}">3rd Semester</span></div>
+                    <div class="card-links">
+                        <a href="/student/results">More info →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TWO-PANEL BODY -->
+        <div class="dashboard-panels">
+            <!-- LEFT: Attendance Table -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3><i class="bi bi-calendar-check me-2"></i>Course-wise Attendance</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table data-table" id="attendanceTable">
+                            <thead>
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Name</th>
+                                    <th>Attendance</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${attendanceSummary}">
+                                    <td th:text="${item.courseCode}">CS301</td>
+                                    <td th:text="${item.courseName}">Data Structures</td>
+                                    <td th:text="${item.presentClasses + '/' + item.totalClasses}">21/27</td>
+                                    <td>
+                                        <span class="pct-badge"
+                                              th:classappend="${item.percentage >= 75 ? 'pct-green' : (item.percentage >= 60 ? 'pct-amber' : 'pct-red')}"
+                                              th:text="${#numbers.formatDecimal(item.percentage, 0, 1) + '%'}">77.8%</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Announcements -->
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3><i class="bi bi-megaphone-fill me-2"></i>Latest Announcements</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table data-table" id="announcementTable">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Category</th>
+                                    <th>Posted By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="ann : ${announcements}">
+                                    <td>
+                                        <a href="#" class="announcement-link"
+                                           th:text="${ann.title}"
+                                           th:attr="data-title=${ann.title},data-body=${ann.body}"
+                                           onclick="showAnnouncement(this)">
+                                            Exam Schedule Published
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="category-badge"
+                                              th:classappend="${ann.category == 'General Announcement' ? 'cat-general' : (ann.category == 'Examination Notice' ? 'cat-exam' : 'cat-dept')}"
+                                              th:text="${ann.category}">General</span>
+                                    </td>
+                                    <td th:text="${ann.postedBy?.username ?: 'Admin'}">Admin</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Announcement Modal -->
+    <div class="modal-overlay" id="announcementModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="modalTitle">Announcement</h4>
+                <button onclick="closeModal()" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <p>Content</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/student.js"></script>
+</body>
+</html>
